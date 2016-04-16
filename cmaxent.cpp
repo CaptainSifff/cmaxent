@@ -459,6 +459,26 @@ static inline void move_accepted ( const int lambda_max, int& NAcc_1, int& NAcc_
     cls_trait.move_accepted_loop ( deltah, h );
 }
 
+template<bool CLS_OPTIMAL>
+static inline void setup_h( const CLS_Trait<CLS_OPTIMAL>& cls_trait, double* __restrict__ deltah, double *const __restrict__ xqmc1, double* const __restrict__ h)
+{
+    for ( uint nt = 0; nt < cls_trait.maxclstau; nt += 8 )
+    {
+        double* ddh = deltah + nt;
+        double* pxqmc1 = xqmc1 + nt;
+        double* ph = h + nt;
+        for ( uint t = 0; t < 4; ++t )
+        {
+            Vec2 temp;
+            temp.loadpd ( ddh + 2*t );
+            temp.v -= _mm_loadu_pd ( pxqmc1 + 2*t );
+            temp.storepd ( ph + 2*t );
+        }
+    }
+    cls_trait.setup_h_loop ( h, deltah, xqmc1 );
+}
+              
+
 template <bool CLS_OPTIMAL, class PAARR>
 static double cmc ( const uint ntau, double *const __restrict__ xqmc1, const double *const __restrict__ xtau, PAARR& xker_table, Vec2 *const __restrict__ xn, const double alpha,
                     const uint nsweeps, double *const __restrict__ xn_m, double& En_m, double& Acc_1, double& Acc_2,
@@ -475,7 +495,6 @@ static double cmc ( const uint ntau, double *const __restrict__ xqmc1, const dou
     deltah = (double*)__builtin_assume_aligned(deltah, 64);
 //    xker_stor = (double *const)__builtin_assume_aligned(xker_stor, 64);
 #endif
-    double* phhh = h;
     memset ( deltah, 0, sizeof ( double ) * ntau );
     for ( uint ng = 0; ng < ngamma; ++ng ) //xn is 16byte aligned, xker_stor is 64 byte aligned, h is 64 byte laigned, xker_table is 64byte aligned
     {
@@ -500,20 +519,7 @@ static double cmc ( const uint ntau, double *const __restrict__ xqmc1, const dou
         }
         cls_trait.setup_x_loop ( xkt_ptr_start, psks_start, deltah, az.x[1] );
     }
-    for ( uint nt = 0; nt < cls_trait.maxclstau; nt += 8 )
-    {
-        double* ddh = deltah + nt;
-        double* pxqmc1 = xqmc1 + nt;
-        double* ph = h + nt;
-        for ( uint t = 0; t < 4; ++t )
-        {
-            Vec2 temp;
-            temp.loadpd ( ddh + 2*t );
-            temp.v -= _mm_loadu_pd ( pxqmc1 + 2*t );
-            temp.storepd ( ph + 2*t );
-        }
-    }
-    cls_trait.setup_h_loop ( h, deltah, xqmc1 );
+    setup_h(cls_trait, deltah, xqmc1, h);
 
     int NAcc_1 = 0;
     int NAcc_2 = 0;
@@ -578,12 +584,12 @@ static double cmc ( const uint ntau, double *const __restrict__ xqmc1, const dou
                 temp1.x[0] = diff[1];
                 temp1.x[1] = diff[1];
                 double* ph = h;
-                for ( int nt = 0; nt < cls_trait.maxclstau; nt += 8, pdh += 8, ph+= 8 )
+                for ( uint nt = 0; nt < cls_trait.maxclstau; nt += 8, pdh += 8, ph+= 8 )
                 {
                     //load cachelines
                     Vec2 xkng1[4];
                     Vec2 xkng2[4];
-                    for ( int t = 0; t < 4; ++t )
+                    for ( uint t = 0; t < 4; ++t )
                     {
                         xkng1[t].loadpd ( &xker_stor[ng1*opti_ntau] + nt + 2*t );
                         xkng2[t].loadpd ( &xker_stor[ng2*opti_ntau] + nt + 2*t );
