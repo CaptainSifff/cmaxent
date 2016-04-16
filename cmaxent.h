@@ -16,6 +16,6 @@
 void cmaxent ( double *const __restrict__ xqmc, const double *const xtau, const int len,
                double xmom1, double ( *xker ) ( const double&, double&, double& ), double ( *backtrans ) ( double&, double&, double& ),
                double beta, double *const alpha_tot, const int n_alpha, const uint ngamma, const double omega_start, const double omega_end,
-               const uint omega_points, int nsweeps, int nbins, uint nwarmup,
+               const uint omega_points, int nsweeps, uint nbins, uint nwarmup,
                const std::string file_root, const std::string dump_Aom, std::string max_stoch_log, std::string energies, std::string best_fit, std::string dump,
                const double *const __restrict__ u, double *const __restrict__ sigma );

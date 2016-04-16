@@ -740,7 +740,7 @@ template <bool CLS_OPTIMAL, class PAARR>
 int cmaxent_pt ( double *const __restrict__ xqmc, const double *const xtau, const int len,
                        double xmom1, double ( *xker ) ( const double&, double&, double& ), double ( *backtrans ) ( double&, double&, double& ),
                        double beta, double *const alpha_tot, const int n_alpha, const uint ngamma, const double omega_start, const double omega_end,
-                       const uint omega_points, int nsweeps, int nbins, uint nwarmup, const std::string dump_Aom, std::string max_stoch_log,
+                       const uint omega_points, int nsweeps, uint nbins, uint nwarmup, const std::string dump_Aom, std::string max_stoch_log,
 		       std::string dump, const double *const __restrict__ u, double *const __restrict__ sigma, Container_2D<Vec2>& xn_tot,
 		       double *const __restrict__ xn_m, double *const __restrict__ xn_e, double *const __restrict__ En_m_tot, double *const __restrict__ En_e_tot,
 		       Container_2D<double>& xn_m_tot, Container_2D<double>& xn_e_tot )
@@ -811,7 +811,7 @@ int cmaxent_pt ( double *const __restrict__ xqmc, const double *const xtau, cons
         for ( uint nw = 0; nw < ndis_table; ++nw )
         {
             double* xker_table_ptr = xker_table[nw];
-            for ( uint nt1 = 0; nt1 < len; ++nt1 )
+            for ( int nt1 = 0; nt1 < len; ++nt1 )
                 xker_table_ptr[nt1] /= sigma[nt1];
         }
     }
@@ -880,7 +880,7 @@ int cmaxent_pt ( double *const __restrict__ xqmc, const double *const xtau, cons
     {
         std::ofstream stochlog ( max_stoch_log.c_str(), ios::app );//move opening of filestream here
         stochlog.precision ( 7 );
-        for ( int ns = 0; ns < nsims; ++ns )
+        for ( uint ns = 0; ns < nsims; ++ns )
         {
             double alpha = alpha_tot[ns];
             double Acc_1, Acc_2;
@@ -958,7 +958,7 @@ template <bool CLS_OPTIMAL>
 inline int cmaxent_pagesplit_selector(uint size_of_nw_line, double *const __restrict__ xqmc, const double *const xtau, const int len,
                double xmom1, double ( *xker ) ( const double&, double&, double& ), double ( *backtrans ) ( double&, double&, double& ),
                double beta, double *const alpha_tot, const int n_alpha, const uint ngamma, const double omega_start, const double omega_end,
-               const uint omega_points, int nsweeps, int nbins, uint nwarmup,
+               const uint omega_points, int nsweeps, uint nbins, uint nwarmup,
                const std::string dump_Aom, std::string max_stoch_log, std::string dump,
                const double *const __restrict__ u, double *const __restrict__ sigma, Container_2D<Vec2>& xn_tot,
 	       double *const __restrict__ xn_m, double *const __restrict__ xn_e, double *const __restrict__ En_m_tot, double *const __restrict__ En_e_tot, Container_2D<double>& xn_m_tot, Container_2D<double>& xn_e_tot )
@@ -1008,7 +1008,7 @@ return retval;
 void cmaxent ( double *const __restrict__ xqmc, const double *const xtau, const int len,
                double xmom1, double ( *xker ) ( const double&, double&, double& ), double ( *backtrans ) ( double&, double&, double& ),
                double beta, double *const alpha_tot, const int n_alpha, const uint ngamma, const double omega_start, const double omega_end,
-               const uint omega_points, int nsweeps, int nbins, uint nwarmup,
+               const uint omega_points, int nsweeps, uint nbins, uint nwarmup,
                const std::string file_root, const std::string dump_Aom, std::string max_stoch_log, std::string energies, std::string best_fit, std::string dump,
                const double *const __restrict__ u, double *const __restrict__ sigma )
 {
