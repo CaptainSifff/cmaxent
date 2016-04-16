@@ -758,13 +758,13 @@ int cmaxent_pt ( double *const __restrict__ xqmc, const double *const xtau, cons
         }
     }
 //normalize data
-    for ( uint i = 0; i < len; ++i )
+    for ( int i = 0; i < len; ++i )
     {
         xqmc[i] /= xmom1;
 //we take care of the normalization of the covariance matrix later, in the eigenvalues
     }
 
-    for ( uint nt = 0; nt < len; ++nt )
+    for ( int nt = 0; nt < len; ++nt )
     {
         //If I divide the full cov matrix by xmom^2 then the eigenvalues change by that. The eigenvectors are unchanged
         //and therefore the expression below by |xmom|
@@ -785,13 +785,13 @@ int cmaxent_pt ( double *const __restrict__ xqmc, const double *const xtau, cons
         {
             memset ( vhelp, 0, len* sizeof ( double ) );
             double* xker_table_ptr = xker_table[nw];
-            for ( uint nt1 = 0; nt1 < len; ++nt1 )
-                for ( uint nt = 0; nt < len; ++nt )
+            for ( int nt1 = 0; nt1 < len; ++nt1 )
+                for ( int nt = 0; nt < len; ++nt )
                 {
                     vhelp[nt1] += xker_table_ptr[nt]*u[nt1 * len + nt];
                 }
 
-            for ( uint nt1 = 0; nt1 < len; ++nt1 )
+            for ( int nt1 = 0; nt1 < len; ++nt1 )
                 xker_table_ptr[nt1] = vhelp[nt1]/sigma[nt1];
         }
     }//end branch for a present cov
@@ -990,7 +990,7 @@ return retval;
  * @param xker the kernel to use
  * @param backtrans the back-transformation
  * @param omega_points the number of points in the omega spectrum
- * @param nsweeps
+ * @param nsweeps the number of updates between measurements
  * @param nbins
  * @param nwarmup the number of configurations that get discarded from the beginning
  * @param u the matrix of eigenvectors or a NULL-pointer if the covariance matrix shall be assumed diagonal

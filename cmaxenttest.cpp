@@ -43,9 +43,9 @@ int main(int argc, char** argv)
   std::vector<double> xqmc;
   std::vector<double> xtau;
   std::vector<double> sigma;
-  int n_alpha = 14;
+  uint n_alpha = 14;
   double xmom = 1.0;
-  int ndis = 500;
+  uint ndis = 500;
   int ngamma = 400;
   double omst = -6.0;
   double omend = 6.0;
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
   int len = xqmc.size() - 1;//quick hack...
   double beta = len*(xtau[1] - xtau[0]);
   //set to !=0 to compile cmaxent
-#if 0
+#if 1
 
   cmaxent(& xqmc[0],& xtau[0], len, xmom, xker, Back_trans_Aom_fermionic, beta, alpha_tot, n_alpha, ngamma, omst, omend, ndis, nsweeps, nbins, nwarmup,
 	   fr, dA, ml, energies, bf, dump, NULL,& sigma[0]);
@@ -107,7 +107,7 @@ sub = 10;
     }
     const double dom = xom[1] - xom[0];
     const double delta = 4*dom;
-    for(int nw = 0; nw < ndis; ++nw)
+    for(uint nw = 0; nw < ndis; ++nw)
     {
         std::complex<double> z(0, 0);
         double om = xom[nw];
