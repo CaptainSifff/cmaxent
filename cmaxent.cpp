@@ -470,7 +470,7 @@ static double cmc ( const uint ntau, double *const __restrict__ xqmc1, const dou
 //setup h(tau)
     double* pxqmc1 = xqmc1;
     double * __restrict__ deltah;
-    posix_memalign ( ( void** ) ( &deltah ), CLS, ntau*sizeof ( double ) );
+    getCLSalignedmem(&deltah, ntau*sizeof ( double ));
 #if GCC_VERSION >= GCC_VER(4,7,0)
 //    h = (double *const)__builtin_assume_aligned(h, 64);
     deltah = (double*)__builtin_assume_aligned(deltah, 64);
