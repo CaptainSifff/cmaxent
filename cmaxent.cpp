@@ -468,7 +468,6 @@ static double cmc ( const uint ntau, double *const __restrict__ xqmc1, const dou
 {
     CLS_Trait<CLS_OPTIMAL> cls_trait ( ntau );
 //setup h(tau)
-    double* pxqmc1 = xqmc1;
     double * __restrict__ deltah;
     getCLSalignedmem(deltah, ntau*sizeof ( double ));
 #if GCC_VERSION >= GCC_VER(4,7,0)
@@ -674,7 +673,6 @@ static double cmc ( const uint ntau, double *const __restrict__ xqmc1, const dou
             current_x2 = next_x2;
 //	    current_xn_ng1 = next_xn_ng1;
         }//end ng loop
-        En = 0;
         Vec2 dEn[4];
         for ( int t = 0; t < 4; ++t )
             dEn[t].zero();
@@ -745,9 +743,9 @@ int cmaxent_pt ( double *const __restrict__ xqmc, const double *const xtau, cons
 		       double *const __restrict__ xn_m, double *const __restrict__ xn_e, double *const __restrict__ En_m_tot, double *const __restrict__ En_e_tot,
 		       Container_2D<double>& xn_m_tot, Container_2D<double>& xn_e_tot )
 {
-    const double DeltaXMAX = 0.01;
-    const double delta = 0.001;
-    const double delta2 = delta*delta;
+    constexpr double DeltaXMAX = 0.01;
+    constexpr double delta = 0.001;
+    constexpr double delta2 = delta*delta;
     const uint ntau = len;
     const uint nsims = n_alpha;
     double om_st_1 = omega_start;
@@ -886,8 +884,8 @@ int cmaxent_pt ( double *const __restrict__ xqmc, const double *const xtau, cons
             double Acc_1, Acc_2;
             double En_m = 0;
             memset ( xn_m, 0, sizeof ( double ) *omega_points );
-//            En_tot[ns] = cmc<CLS_OPTIMAL> ( ntau, xqmc1, xtau, xker_table, xn_tot[ns], alpha, nsweeps, xn_m, En_m, Acc_1, Acc_2,
-//                                            DeltaXMAX, delta2, om_st_1, om_en_1, invdom, iseed, omega_points, ngamma, xker_stor , opti_ntau, h );
+            En_tot[ns] = cmc<CLS_OPTIMAL> ( ntau, xqmc1, xtau, xker_table, xn_tot[ns], alpha, nsweeps, xn_m, En_m, Acc_1, Acc_2,
+                                            DeltaXMAX, delta2, om_st_1, om_en_1, invdom, iseed, omega_points, ngamma, xker_stor , opti_ntau, h );
             //the result is the energy of the configuration xn_tot for simulation ns
             stochlog<<"Alpha, En_m, Acc "<< 1.0/alpha<<" "<<En_m<<" "<<Acc_1<<" "<<Acc_2<<std::endl;//do not use scientific here
             if ( likely ( nb > nwarmup ) )
