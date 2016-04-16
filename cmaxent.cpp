@@ -122,6 +122,17 @@ inline double fast_exp ( double y ) //4% error in [-100; 100 ], using this in th
     return d;
 }
 
+/** Request a chunk of aligned memory that is aligned to the Cache Line size as given by CLS
+ * @param mem A pointer to the memory location.
+ * @param size The size in bytes of the rquested memory.
+ */
+template <typename T>
+void getCLSalignedmem( T** mem, size_t size)
+{
+    int status = posix_memalign ( (void**) mem, CLS, size );
+    if ( unlikely ( status != 0 ) ) throw std::runtime_error ( "failed to allocate memory!" );
+}
+
 /**
 A class to store large amounts of data, while keeping the number of page faults on the second index(nt)
 small. Therefore every line of nw is (ideally) on a seperate page
@@ -143,8 +154,7 @@ public:
         std::cout<<"Requesting "<<nr_of_pages*page_size/1024.0/1024.0<<" MBs of memory"<<std::endl;
         std::cout<<"sizeof user data: "<<nw_max*nt_max*sizeof ( T ) /1024.0/1024.0<<std::endl;
         std::cout<<"Percentage used: "<<nw_max*nt_max*sizeof ( T ) /1024.0/1024.0/ ( nr_of_pages*page_size/1024.0/1024.0 ) *100.0<<"%"<<std::endl;
-        int status = posix_memalign ( ( void** ) &mem, CLS, nr_of_pages* page_size );
-        if ( unlikely ( status != 0 ) ) throw std::runtime_error ( "failed to allocate memory!" );
+        getCLSalignedmem(&mem, nr_of_pages* page_size);
     }
     inline ~PAARR_2D_dynamic_small()
     {
@@ -180,8 +190,7 @@ public:
         std::cout<<"Requesting "<<nr_of_pages*page_size/1024.0/1024.0<<" MBs of memory"<<std::endl;
         std::cout<<"sizeof user data: "<<nw_max*nt_max*sizeof ( T ) /1024.0/1024.0<<std::endl;
         std::cout<<"Percentage used: "<<nw_max*nt_max*sizeof ( T ) /1024.0/1024.0/ ( nr_of_pages*page_size/1024.0/1024.0 ) *100.0<<"%"<<std::endl;
-        int status = posix_memalign ( ( void** ) &mem, CLS, nr_of_pages* page_size );
-        if ( unlikely ( status != 0 ) ) throw std::runtime_error ( "failed to allocate memory!" );
+        getCLSalignedmem(&mem, nr_of_pages* page_size);
     }
     inline ~PAARR_2D_small()
     {
@@ -216,8 +225,7 @@ public:
         std::cout<<"Requesting "<<nr_of_pages*page_size/1024.0/1024.0<<" MBs of memory"<<std::endl;
         std::cout<<"sizeof user data: "<<nw_max*nt_max*sizeof ( T ) /1024.0/1024.0<<std::endl;
         std::cout<<"Percentage used: "<<nw_max*nt_max*sizeof ( T ) /1024.0/1024.0/ ( nr_of_pages*page_size/1024.0/1024.0 ) *100.0<<"%"<<std::endl;
-        int status = posix_memalign ( ( void** ) &mem, CLS, nr_of_pages* page_size );
-        if ( unlikely ( status != 0 ) ) throw std::runtime_error ( "failed to allocate memory!" );
+        getCLSalignedmem(&mem, nr_of_pages* page_size);
     }
     ~PAARR_2D_dynamic_large()
     {
@@ -878,8 +886,8 @@ int cmaxent_pt ( double *const __restrict__ xqmc, const double *const xtau, cons
             double Acc_1, Acc_2;
             double En_m = 0;
             memset ( xn_m, 0, sizeof ( double ) *omega_points );
-            En_tot[ns] = cmc<CLS_OPTIMAL> ( ntau, xqmc1, xtau, xker_table, xn_tot[ns], alpha, nsweeps, xn_m, En_m, Acc_1, Acc_2,
-                                            DeltaXMAX, delta2, om_st_1, om_en_1, invdom, iseed, omega_points, ngamma, xker_stor , opti_ntau, h );
+//            En_tot[ns] = cmc<CLS_OPTIMAL> ( ntau, xqmc1, xtau, xker_table, xn_tot[ns], alpha, nsweeps, xn_m, En_m, Acc_1, Acc_2,
+//                                            DeltaXMAX, delta2, om_st_1, om_en_1, invdom, iseed, omega_points, ngamma, xker_stor , opti_ntau, h );
             //the result is the energy of the configuration xn_tot for simulation ns
             stochlog<<"Alpha, En_m, Acc "<< 1.0/alpha<<" "<<En_m<<" "<<Acc_1<<" "<<Acc_2<<std::endl;//do not use scientific here
             if ( likely ( nb > nwarmup ) )
