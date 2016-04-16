@@ -127,7 +127,7 @@ inline double fast_exp ( double y ) //4% error in [-100; 100 ], using this in th
  * @param size The size in bytes of the rquested memory.
  */
 template <typename T>
-void getCLSalignedmem( T** mem, size_t size)
+static inline void getCLSalignedmem( T* __restrict__& mem, size_t size)
 {
     int status = posix_memalign ( (void**) mem, CLS, size );
     if ( unlikely ( status != 0 ) ) throw std::runtime_error ( "failed to allocate memory!" );
@@ -154,7 +154,7 @@ public:
         std::cout<<"Requesting "<<nr_of_pages*page_size/1024.0/1024.0<<" MBs of memory"<<std::endl;
         std::cout<<"sizeof user data: "<<nw_max*nt_max*sizeof ( T ) /1024.0/1024.0<<std::endl;
         std::cout<<"Percentage used: "<<nw_max*nt_max*sizeof ( T ) /1024.0/1024.0/ ( nr_of_pages*page_size/1024.0/1024.0 ) *100.0<<"%"<<std::endl;
-        getCLSalignedmem(&mem, nr_of_pages* page_size);
+        getCLSalignedmem(mem, nr_of_pages* page_size);
     }
     inline ~PAARR_2D_dynamic_small()
     {
@@ -190,7 +190,7 @@ public:
         std::cout<<"Requesting "<<nr_of_pages*page_size/1024.0/1024.0<<" MBs of memory"<<std::endl;
         std::cout<<"sizeof user data: "<<nw_max*nt_max*sizeof ( T ) /1024.0/1024.0<<std::endl;
         std::cout<<"Percentage used: "<<nw_max*nt_max*sizeof ( T ) /1024.0/1024.0/ ( nr_of_pages*page_size/1024.0/1024.0 ) *100.0<<"%"<<std::endl;
-        getCLSalignedmem(&mem, nr_of_pages* page_size);
+        getCLSalignedmem(mem, nr_of_pages* page_size);
     }
     inline ~PAARR_2D_small()
     {
@@ -225,7 +225,7 @@ public:
         std::cout<<"Requesting "<<nr_of_pages*page_size/1024.0/1024.0<<" MBs of memory"<<std::endl;
         std::cout<<"sizeof user data: "<<nw_max*nt_max*sizeof ( T ) /1024.0/1024.0<<std::endl;
         std::cout<<"Percentage used: "<<nw_max*nt_max*sizeof ( T ) /1024.0/1024.0/ ( nr_of_pages*page_size/1024.0/1024.0 ) *100.0<<"%"<<std::endl;
-        getCLSalignedmem(&mem, nr_of_pages* page_size);
+        getCLSalignedmem(mem, nr_of_pages* page_size);
     }
     ~PAARR_2D_dynamic_large()
     {
@@ -470,7 +470,7 @@ static double cmc ( const uint ntau, double *const __restrict__ xqmc1, const dou
 //setup h(tau)
     double* pxqmc1 = xqmc1;
     double * __restrict__ deltah;
-    getCLSalignedmem(&deltah, ntau*sizeof ( double ));
+    getCLSalignedmem(deltah, ntau*sizeof ( double ));
 #if GCC_VERSION >= GCC_VER(4,7,0)
 //    h = (double *const)__builtin_assume_aligned(h, 64);
     deltah = (double*)__builtin_assume_aligned(deltah, 64);
@@ -870,8 +870,8 @@ int cmaxent_pt ( double *const __restrict__ xqmc, const double *const xtau, cons
     double En_tot[nsims];
     double* xker_stor;
     double* h;
-    posix_memalign ( ( void** ) ( &xker_stor ), CLS, ngamma*opti_ntau*sizeof ( double ) );
-    posix_memalign ( ( void** ) ( &h ), CLS, ntau*sizeof ( double ) );
+    getCLSalignedmem(xker_stor, ngamma*opti_ntau*sizeof ( double ) );
+    getCLSalignedmem(h, ntau*sizeof ( double ) );
 #if GCC_VERSION >= GCC_VER(4,7,0)
     h = (double*)__builtin_assume_aligned(h, 64);
     xker_stor = (double*)__builtin_assume_aligned(xker_stor, 64);
