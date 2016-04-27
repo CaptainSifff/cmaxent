@@ -7,8 +7,8 @@
  * @param xker the kernel to use
  * @param backtrans the back-transformation
  * @param omega_points the number of points in the omega spectrum
- * @param nsweeps
- * @param nbins
+ * @param nsweeps The number of updates/sweeps we do between two sweeps
+ * @param nbins The number of bins that we collect
  * @param nwarmup the number of configurations that get discarded from the beginning
  * @param u the matrix of eigenvectors or a NULL-pointer if the covariance matrix shall be assumed diagonal
  * @param sigma eigenvalues of the covariance matrix or errors
