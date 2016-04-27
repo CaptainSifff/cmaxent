@@ -129,7 +129,7 @@ inline double fast_exp ( double y ) //4% error in [-100; 100 ], using this in th
 template <typename T>
 static inline void getCLSalignedmem( T* __restrict__& mem, size_t size)
 {
-    int status = posix_memalign ( (void**) mem, CLS, size );
+    int status = posix_memalign ( (void**) &mem, CLS, size );
     if ( unlikely ( status != 0 ) ) throw std::runtime_error ( "failed to allocate memory!" );
 }
 
