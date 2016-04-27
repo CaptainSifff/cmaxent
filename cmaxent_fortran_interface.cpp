@@ -9,9 +9,15 @@
  * @param xmom1 the first moment
  * @param xker the kernel to use
  * @param backtrans the back-transformation
+ * @param beta The inverse temperature beta
+ * @param alpha_tot
+ * @param n_alpha 
+ * @param ngamma The number of delta functions
+ * @param omega_start the beginning of the energy window
+ * @param omega_end The end of the energy window
  * @param omega_points the number of points in the omega spectrum
- * @param nsweeps
- * @param nbins
+ * @param nsweeps 
+ * @param nbins The number of bins
  * @param nwarmup the number of configurations that get discarded from the beginning
  * @param u the matrix of eigenvectors or a NULL-pointer if the covariance matrix shall be assumed diagonal
  * @param sigma eigenvalues of the covariance matrix or errors

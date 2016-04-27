@@ -11,7 +11,7 @@
  * @param nbins The number of bins that we collect
  * @param nwarmup the number of configurations that get discarded from the beginning
  * @param u the matrix of eigenvectors or a NULL-pointer if the covariance matrix shall be assumed diagonal
- * @param sigma eigenvalues of the covariance matrix or errors
+ * @param sigma eigenvalues of the covariance matrix which is equal to the variance squared.
  * */
 void cmaxent ( double *const __restrict__ xqmc, const double *const xtau, const int len,
                double xmom1, double ( *xker ) ( const double&, double&, double& ), double ( *backtrans ) ( double&, double&, double& ),
