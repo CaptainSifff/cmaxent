@@ -146,7 +146,7 @@ class PAARR_2D_dynamic_small//Page-aligned-array...with two indices
 public:
     inline PAARR_2D_dynamic_small ( uint nw_max, uint nt_max )
     {
-//calculate the memory one whole nw line takes, if we use proper CL alignment.
+        //calculate the memory one whole nw line takes, if we use proper CL alignment.
         size_of_nw_line = ( ( nt_max*sizeof ( T ) %CLS == 0 ) ? nt_max*sizeof ( T ) : ( nt_max*sizeof ( T ) /CLS +1 ) *CLS );
         nw_indices_per_page = page_size/size_of_nw_line;
         uint nr_of_pages = nw_max/nw_indices_per_page;
@@ -162,18 +162,18 @@ public:
     }
     inline T *const operator[] ( uint nw )
     {
-//determine page...
+        //determine page...
         uint page = nw/nw_indices_per_page;//getting rid of this division yields a speedup of 3%...
-//offset into that page
+        //offset into that page
         uint offs_into_page = nw % nw_indices_per_page;
         uint page_offset = page<<page_size_exponent;//gcc can optimize this multiplication itself, if page_size is a true literal
-//return address using byte based numbers
+        //return address using byte based numbers
         return ( T* ) ( ( char* ) mem + page_offset + offs_into_page*size_of_nw_line );
     }
 private:
-    T* mem;
     uint size_of_nw_line;
     uint nw_indices_per_page;
+    T* mem;
 };
 
 template <class T, uint nw_indices_per_page>
@@ -182,9 +182,8 @@ class PAARR_2D_small//Page-aligned-array...with two indices
 public:
     inline PAARR_2D_small ( uint nw_max, uint nt_max )
     {
-//calculate the memory one whole nw line takes, if we use proper CL alignment.
+        //calculate the memory one whole nw line takes, if we use proper CL alignment.
         size_of_nw_line = ( ( nt_max*sizeof ( T ) %CLS == 0 ) ? nt_max*sizeof ( T ) : ( nt_max*sizeof ( T ) /CLS +1 ) *CLS );
-//        nw_indices_per_page = page_size/size_of_nw_line;
         uint nr_of_pages = nw_max/nw_indices_per_page;
         std::cout<<"parameters of static PAARR_2D_small nr_of_pages = "<<nr_of_pages<<" indices_per_page="<<nw_indices_per_page<<" pagesize = "<<page_size<<std::endl;
         std::cout<<"Requesting "<<nr_of_pages*page_size/1024.0/1024.0<<" MBs of memory"<<std::endl;
@@ -209,16 +208,14 @@ public:
 private:
     T* mem;
     uint size_of_nw_line;
-//    uint nw_indices_per_page;
 };
 
 template <class T>
 class PAARR_2D_dynamic_large//Page-aligned-array...with two indices
 {
 public:
-    PAARR_2D_dynamic_large ( uint nw_max, uint nt_max )
+    PAARR_2D_dynamic_large ( uint nw_max, uint nt_max ) : pages_per_index(nt_max*sizeof(T)/page_size + 1)
     {
-      pages_per_index = (nt_max*sizeof(T)/page_size + 1);
         uint size_of_nw_line = pages_per_index*page_size;
         uint nr_of_pages = nw_max*pages_per_index;
         std::cout<<"parameters of PAARR_2D_large nr_of_pages = "<<nr_of_pages<<" pages per index: "<<pages_per_index<<" size_of_line="<<size_of_nw_line<<" pagesize = "<<page_size<<std::endl;
@@ -241,8 +238,8 @@ public:
         return ( T* ) ( ( char* ) mem + page_offset);
     }
 private:
-    T* mem;
     uint pages_per_index;
+    T* mem;
 };
 
 #ifdef __GNUC__
@@ -262,6 +259,11 @@ static double cmc ( const uint ntau, double *const __restrict__ xqmc1, const dou
 #endif
 
 double normalization = 1.0/static_cast<double> ( ( std::numeric_limits< uint >::max()-1 ) );
+
+/** A linear congruential RNG. generates a number in the interval [0..1]
+ * @param seed an integer describing the internal state
+ * @return A pseudo random number from [0..1]
+ */
 static inline double ranf ( uint& seed ) //Note that on my system the uint is 4 bytes in size... if its different on yours other choices for the RNG should be better
 {
     /*
@@ -294,6 +296,10 @@ static inline Vec2 ranf2 ( uint& seed ) //Note that on my system the uint is 4 b
     return  retval;
 }
 
+/** A function to generate a random integer
+ * @param high the maximum value
+ * @param iseed the state of the RNG
+ */
 static inline int ri ( int high, uint& seed )
 {
     /*
@@ -306,6 +312,9 @@ static inline int ri ( int high, uint& seed )
     return std::lround ( ranf ( seed ) *high );
 }
 
+/** A function to conditionally take the sqrt of a if it is a positive number. Else it is zero
+ * @param a The number of which to take the sqrt
+ */
 static void condsqrt ( double& a )
 {
     if ( a > 0 )
@@ -459,7 +468,11 @@ static inline void move_accepted ( const int lambda_max, int& NAcc_1, int& NAcc_
     cls_trait.move_accepted_loop ( deltah, h );
 }
 
-/**
+/** A function to set up the h array
+ * @param cls_trait The trait for the remaiders
+ * @param deltah
+ * @param xqmc1 the monte carlo data
+ * @param h
  */
 template<bool CLS_OPTIMAL>
 static inline void setup_h( const CLS_Trait<CLS_OPTIMAL>& cls_trait, const double *const __restrict__ deltah, const double *const __restrict__ xqmc1, double *const __restrict__ h)
