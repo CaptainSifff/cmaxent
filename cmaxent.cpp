@@ -359,7 +359,7 @@ struct CLS_Trait
     inline void setup_x_loop ( const double*, double*, double*, double ) const
     {
     }
-    inline void setup_h_loop ( double*, double*, double* ) const
+    inline void setup_h_loop ( double *const, const double *const, const double *const ) const
     {
     }
     inline void lambda0_remainder ( const double* const, const double* const, const double *const, double* const, const double, double& ) const {}
@@ -387,7 +387,7 @@ struct CLS_Trait<false>
             deltah[nt] += temp * zgamma;//we abuse deltah here to store the intermediate x values
         }
     }
-    inline void setup_h_loop ( double* h, double* deltah, double* xqmc1 ) const
+    inline void setup_h_loop ( double *const h, const double *const deltah, const double *const xqmc1 ) const
     {
         for ( uint nt = maxclstau; nt < ntau; ++nt )
         {
@@ -459,14 +459,16 @@ static inline void move_accepted ( const int lambda_max, int& NAcc_1, int& NAcc_
     cls_trait.move_accepted_loop ( deltah, h );
 }
 
+/**
+ */
 template<bool CLS_OPTIMAL>
-static inline void setup_h( const CLS_Trait<CLS_OPTIMAL>& cls_trait, double* __restrict__ deltah, double *const __restrict__ xqmc1, double* const __restrict__ h)
+static inline void setup_h( const CLS_Trait<CLS_OPTIMAL>& cls_trait, const double *const __restrict__ deltah, const double *const __restrict__ xqmc1, double *const __restrict__ h)
 {
     for ( uint nt = 0; nt < cls_trait.maxclstau; nt += 8 )
     {
-        double* ddh = deltah + nt;
-        double* pxqmc1 = xqmc1 + nt;
-        double* ph = h + nt;
+        const double *const ddh = deltah + nt;
+        const double *const pxqmc1 = xqmc1 + nt;
+        double *const ph = h + nt;
         for ( uint t = 0; t < 4; ++t )
         {
             Vec2 temp;
@@ -477,7 +479,6 @@ static inline void setup_h( const CLS_Trait<CLS_OPTIMAL>& cls_trait, double* __r
     }
     cls_trait.setup_h_loop ( h, deltah, xqmc1 );
 }
-              
 
 template <bool CLS_OPTIMAL, class PAARR>
 static double cmc ( const uint ntau, double *const __restrict__ xqmc1, const double *const __restrict__ xtau, PAARR& xker_table, Vec2 *const __restrict__ xn, const double alpha,
